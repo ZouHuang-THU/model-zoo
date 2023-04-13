@@ -9,7 +9,7 @@ BM1684:
   fp_compile_options:
     python3 -m bmpaddle
       --model $(model)
-      --shapes [[1,3,640,320]]
+      --shapes [1,3,640,320]
       --net_name $(name)
       --target $(target)
       --enable_profile True
@@ -37,3 +37,28 @@ BM1684:
 #   --enable_profile True
 
 # precision: false
+
+fp_batch_sizes: [1, 4]
+
+BM1684X:
+  fp_loops:
+    - build_env:
+        - BMCOMPILER_GROUP_SEARCH_COUNT=1
+      fp_outdir_template: "{}b.fp32.compilation"
+      prec: FP32
+    - build_env:
+        - BMCOMPILER_LAYER_DTYPE_MODE=fp16
+        - BMCOMPILER_GROUP_SEARCH_COUNT=1
+      fp_outdir_template: "{}b.fp16.compilation"
+      prec: FP16
+
+  fp_compile_options:
+    python3 -m bmpaddle
+    --model $(model)
+    --shapes [1,3,640,320]
+    --net_name $(name)
+    --target $(target)
+    --enable_profile True
+    --cmp True
+    --enable_profile True
+    --output="bilinear_interp_v2_2.tmp_0"
